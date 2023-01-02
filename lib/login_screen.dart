@@ -1,60 +1,51 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
-import 'constants.dart';
+import 'package:tp_flutter_3/constants.dart';
+import 'package:tp_flutter_3/register_screen.dart';
 import 'items_list_screen.dart';
 
-class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({Key? key}) : super(key: key);
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({Key? key}) : super(key: key);
 
   @override
-  State<RegisterScreen> createState() => _RegisterScreenState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
+class _LoginScreenState extends State<LoginScreen> {
   var _email = "";
   var _password = "";
-  var _repeatPassword = "";
 
-  Future<void> register(BuildContext context) async {
-    final AuthResponse res = await supabase.auth.signUp(
-      email: _email,
-      password: _password,
-    );
-    final Session? session = res.session;
-    final User? user = res.user;
-
-    if (!mounted) return;
-
-    if (user != null) {
-      context.showSnackBar(message: "Registered successfully");
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const ItemsListScreen(),
-        ),
+  Future<void> onLogicPressed(BuildContext context) async {
+    try {
+      final AuthResponse res = await supabase.auth.signInWithPassword(
+        email: _email,
+        password: _password,
       );
-    } else {
-      context.showErrorSnackBar(message: "Error while registering");
-    }
-  }
+      final Session? session = res.session;
+      final User? user = res.user;
 
-  onRegisterPressed(BuildContext context) async {
-    // Validate if the password and the repeat password are the same
-    // If they are not the same, show an error message
-    // If they are the same, call the register method
-    if (_password != _repeatPassword) {
-      context.showErrorSnackBar(message: "Passwords are not the same");
-      return;
+      if (!mounted) return;
+      if (session != null && user != null) {
+        context.showSnackBar(message: "Logged in successfully");
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const ItemsListScreen(),
+          ),
+        );
+      } else {
+        context.showErrorSnackBar(message: "Error while logging in");
+      }
+    } on AuthException catch (e) {
+      context.showErrorSnackBar(message: e.message);
     }
-    await register(context);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Register'),
+        title: const Text('Login or Register'),
       ),
       body: SafeArea(
         child: Container(
@@ -63,7 +54,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Text(
-                "Register",
+                "Login or Register",
                 style: TextStyle(
                   fontSize: 40,
                   fontWeight: FontWeight.bold,
@@ -101,29 +92,34 @@ class _RegisterScreenState extends State<RegisterScreen> {
               const SizedBox(
                 height: 20,
               ),
-              TextField(
-                obscureText: true,
-                decoration: const InputDecoration(
-                  hintText: "Confirm Password",
-                  border: OutlineInputBorder(),
-                ),
-                onChanged: (value) {
-                  setState(() {
-                    _repeatPassword = value;
-                  });
-                },
-              ),
-              const SizedBox(
-                height: 20,
-              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () => onRegisterPressed(context),
-                      child: const Text("Register"),
+                      onPressed: () => onLogicPressed(context),
+                      child: const Text("Login"),
                     ),
+                  ),
+                ],
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text("Don't have an account?"),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const RegisterScreen(),
+                        ),
+                      );
+                    },
+                    child: const Text("Register"),
                   ),
                 ],
               ),

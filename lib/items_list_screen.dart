@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 
-class Movie {
-  final String title;
-  final String director;
-  final String posterUrl;
+import 'constants.dart';
+import 'login_screen.dart';
 
-  Movie({
-    required this.title,
-    required this.director,
-    required this.posterUrl,
+class Dish {
+  final String name;
+  bool fav;
+
+  Dish({
+    required this.name,
+    required this.fav,
   });
 }
 
@@ -19,68 +20,86 @@ class ItemsListScreen extends StatefulWidget {
   State<ItemsListScreen> createState() => _ItemsListScreenState();
 }
 
+enum MenuOptions { LOGOUT }
+
 class _ItemsListScreenState extends State<ItemsListScreen> {
-  final List<Movie> _listMovies = [
-    Movie(
-      title: "The Shawshank Redemption",
-      director: "Frank Darabont",
-      posterUrl:
-          "https://upload.wikimedia.org/wikipedia/en/8/81/ShawshankRedemptionMoviePoster.jpg",
-    ),
-    Movie(
-      title: "The Godfather",
-      director: "Francis Ford Coppola",
-      posterUrl:
-          "https://upload.wikimedia.org/wikipedia/en/1/1c/Godfather_ver1.jpg",
-    ),
-    Movie(
-      title: "The Godfather: Part II",
-      director: "Francis Ford Coppola",
-      posterUrl:
-          "https://upload.wikimedia.org/wikipedia/en/0/03/Godfather_part_ii.jpg",
-    ),
-    Movie(
-      title: "The Dark Knight",
-      director: "Christopher Nolan",
-      posterUrl:
-          "https://upload.wikimedia.org/wikipedia/en/1/1c/The_Dark_Knight_%282008_film%29.jpg",
-    ),
-    Movie(
-      title: "12 Angry Men",
-      director: "Sidney Lumet",
-      posterUrl:
-          "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/12_Angry_Men_%281957_film_poster%29.jpg/440px-12_Angry_Men_%281957_film_poster%29.jpg",
-    ),
-    Movie(
-      title: "Schindler's List",
-      director: "Steven Spielberg",
-      posterUrl:
-          "https://upload.wikimedia.org/wikipedia/en/3/38/Schindler%27s_List_movie.jpg",
-    ),
-    Movie(
-      title: "The Lord of the Rings: The Return of the King",
-      director: "Peter Jackson",
-      posterUrl:
-          "https://upload.wikimedia.org/wikipedia/en/b/be/The_Lord_of_the_Rings_-_The_Return_of_the_King_%282003%29.jpg",
-    ),
-    Movie(
-      title: "Pulp Fiction",
-      director: "Quentin Tarantino",
-      posterUrl:
-          "https://upload.wikimedia.org/wikipedia/en/3/3b/Pulp_Fiction_%281994%29_poster.jpg",
-    ),
-    Movie(
-      title: "The Good, the Bad and the Ugly",
-      director: "Sergio Leone",
-      posterUrl:
-          "https://upload.wikimedia.org/wikipedia/en/4/45/Good_the_bad_and_the_ugly_poster.jpg",
-    ),
+  final List<Dish> _dishesList = [
+    Dish(name: "Pizza", fav: false),
+    Dish(name: "Pasta", fav: false),
+    Dish(name: "Burger", fav: false),
+    Dish(name: "Salad", fav: false),
+    Dish(name: "Sandwich", fav: false),
+    Dish(name: "Soup", fav: false),
+    Dish(name: "Fries", fav: false),
+    Dish(name: "Tacos", fav: false),
+    Dish(name: "Burrito", fav: false),
+    Dish(name: "Sushi", fav: false),
+    Dish(name: "Ramen", fav: false),
+    Dish(name: "Noodles", fav: false),
+    Dish(name: "Steak", fav: false),
+    Dish(name: "Chicken", fav: false),
+    Dish(name: "Fish", fav: false),
+    Dish(name: "Rice", fav: false),
+    Dish(name: "Eggs", fav: false),
+    Dish(name: "Pancakes", fav: false),
+    Dish(name: "Waffles", fav: false),
+    Dish(name: "Ice Cream", fav: false),
+    Dish(name: "Cake", fav: false),
+    Dish(name: "Pie", fav: false),
+    Dish(name: "Cookies", fav: false),
+    Dish(name: "Donuts", fav: false),
+    Dish(name: "Cupcakes", fav: false),
+    Dish(name: "Muffins", fav: false),
+    Dish(name: "Candy", fav: false),
+    Dish(name: "Chocolate", fav: false),
+    Dish(name: "Cheese", fav: false),
+    Dish(name: "Bread", fav: false),
+    Dish(name: "Peanut Butter", fav: false),
+    Dish(name: "Jelly", fav: false),
+    Dish(name: "Jam", fav: false),
+    Dish(name: "Honey", fav: false),
+    Dish(name: "Milk", fav: false),
+    Dish(name: "Juice", fav: false),
+    Dish(name: "Water", fav: false),
+    Dish(name: "Tea", fav: false),
+    Dish(name: "Coffee", fav: false),
+    Dish(name: "Soda", fav: false),
+    Dish(name: "Beer", fav: false),
+    Dish(name: "Wine", fav: false),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        actions: <Widget>[
+          PopupMenuButton(
+            onSelected: (MenuOptions result) async {
+              switch (result) {
+                case MenuOptions.LOGOUT:
+                  await supabase.auth.signOut();
+                  // Navigate to the login screen
+                  if (!mounted) return;
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const LoginScreen(),
+                    ),
+                  );
+                  break;
+              }
+            },
+            icon: const Icon(Icons.more_vert),
+            itemBuilder: (BuildContext context) {
+              return [
+                const PopupMenuItem(
+                  value: MenuOptions.LOGOUT,
+                  child: Text('Logout'),
+                )
+              ];
+            },
+          ),
+        ],
         title: const Text('Movies List'),
       ),
       body: SafeArea(
@@ -88,17 +107,27 @@ class _ItemsListScreenState extends State<ItemsListScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: ListView.builder(
             shrinkWrap: false,
-            itemCount: _listMovies.length,
+            itemCount: _dishesList.length,
             itemBuilder: (context, index) {
               return Card(
                 child: ListTile(
-                  leading: Image.network(
-                    _listMovies[index % _listMovies.length].posterUrl,
-                    width: 50,
+                  title: Text(_dishesList[index % _dishesList.length].name),
+                  trailing: IconButton(
+                    icon: Icon(
+                      _dishesList[index % _dishesList.length].fav
+                          ? Icons.favorite
+                          : Icons.favorite_border,
+                      color: _dishesList[index % _dishesList.length].fav
+                          ? Colors.red
+                          : Colors.grey,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _dishesList[index % _dishesList.length].fav =
+                            !_dishesList[index % _dishesList.length].fav;
+                      });
+                    },
                   ),
-                  title: Text(_listMovies[index % _listMovies.length].title),
-                  subtitle:
-                      Text(_listMovies[index % _listMovies.length].director),
                 ),
               );
             },
